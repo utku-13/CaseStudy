@@ -1,4 +1,5 @@
 import os
+import sys
 import ctypes
 from ctypes import c_char_p
 import binascii
@@ -8,9 +9,25 @@ import base64
 os.add_dll_directory(r"C:\msys64\mingw64\bin")
 
 
-# 1- DLL kütüphanesini çağırdık.
-current_dir = os.path.dirname(os.path.abspath(__file__))
-dll_path = os.path.join(current_dir, "dll_source_file", "functionsfromc.dll")
+def get_base_dir():
+    """
+    Returns the directory of:
+    - the .py file when running with 'python main.py' (script mode)
+    - the .exe file when running the PyInstaller binary (frozen mode)
+    """
+    if getattr(sys, "frozen", False):
+        # Running as a PyInstaller-built EXE
+        return os.path.dirname(sys.executable)
+    else:
+        # Running as a normal Python script
+        return os.path.dirname(os.path.abspath(__file__))
+
+
+base_dir = get_base_dir()
+
+# DLL folder and path (relative to base_dir)
+dll_dir = os.path.join(base_dir, "dll_source_file")
+dll_path = os.path.join(dll_dir, "functionsfromc.dll")
 
 
 print(f"Loading DLL from: {dll_path}")
@@ -68,7 +85,7 @@ else:
         image_bytes = binascii.unhexlify(image_hex)
 
         # Dosyaya yazıp görseli elde et (ör: recovered_from_hex.png)
-        recovered_path = os.path.join(current_dir, "recovered_from_hex.png")
+        recovered_path = os.path.join(dll_dir, "recovered_from_hex.png")
         with open(recovered_path, "wb") as f:
             f.write(image_bytes)
 
