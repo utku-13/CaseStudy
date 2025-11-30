@@ -11,19 +11,19 @@ extern "C" {
 
     // 1- Basit string dönen fonksiyon
     __declspec(dllexport) const char* get_hello() {
-        static std::string result = "String dönen ilk fonsiyon";
+        static std::string result = "ilk String, Selamlar ";
         return result.c_str();
     }
 
     // 2- ikinci string döndüren fonksiyon
     __declspec(dllexport) const char* get_company_name() {
-        static std::string result = "String dönen ikinci fonsiyon";
+        static std::string result = "İkinci String, Firma Adı: Turkish Technology";
         return result.c_str();
     }
 
     // 3- Üçüncü string döndüren fonksiyon
     __declspec(dllexport) const char* get_role() {
-        static std::string result = "String dönen üçüncü fonsiyon";
+        static std::string result = "Üçüncü String, Rol: Python Developer";
         return result.c_str();
     }
 
@@ -48,21 +48,17 @@ extern "C" {
     }
 
     // 5- Görseli okuyup hexadecimal string döndüren fonksiyon
-    // butterfly.png gibi bir dosyayı aynı klasörde arar.
-    __declspec(dllexport) const char* get_image_hex_with_filename(const char* filename) {
+    __declspec(dllexport) const char* get_image_hex() {
         static std::string hexResult;
-
-        if (filename == nullptr) {
-            hexResult = "ERROR: filename is null";
-            return hexResult.c_str();
-        }
+        const char* filename = "dll_source_file/smallpng.png";  // Seçtiğin görselin adı
 
         std::ifstream file(filename, std::ios::binary);
         if (!file) {
-            hexResult = "ERROR: cannot open file.";
+            hexResult = "ERROR: cannot open image file.";
             return hexResult.c_str();
         }
 
+        // Dosyanın tüm byte'larını oku
         std::vector<unsigned char> buffer(
             (std::istreambuf_iterator<char>(file)),
             std::istreambuf_iterator<char>()
