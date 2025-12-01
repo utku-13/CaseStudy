@@ -131,6 +131,7 @@ class AppService(win32serviceutil.ServiceFramework):
         servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
                               servicemanager.PYS_SERVICE_STARTED,
                               (self._svc_name_, ''))
+        self.ReportServiceStatus(win32service.SERVICE_RUNNING)
         self.main_loop()
 
     def main_loop(self):
@@ -175,21 +176,33 @@ class AppService(win32serviceutil.ServiceFramework):
 # --- 3. Entry Point ---
 
 if __name__ == '__main__':
-    # 1. Mod: GUI Worker (İşçi)
+    # 1. Mod: GUI Worker (İşçi) - Servis tarafindan bu parametreyle cagrilir
     if "--gui-worker" in sys.argv:
         worker_gui_loop()
     
-    # 2. Mod: Service Command (Yönetici)
+    # 2. Mod: Komut Satiri Argumanlari (install, start, remove vb.)
     elif len(sys.argv) > 1:
         if os.name == 'nt':
             win32serviceutil.HandleCommandLine(AppService)
         else:
             print("Service komutlari sadece Windows'ta calisir.")
 
-    # 3. Mod: Test / Manual Run
+    # 3. Mod: Argumansiz Cagri (Servis Baslangici VEYA Cift Tiklama)
     else:
-        print("Test modunda çalışıyor... (Kapatmak için Ctrl+C)")
-        try:
+        # Windows'ta argumansiz calisiyorsa, once Servis olarak baslamayi deneriz.
+        # Eger hata alirsak (cunku normal konsoldan calistirilmislardir), normal moda duseriz.
+        if os.name == 'nt':
+            try:
+                servicemanager.Initialize()
+                servicemanager.PrepareToHostSingle(AppService)
+                servicemanager.StartServiceCtrlDispatcher()
+            except Exception:
+                # Servis dispatcher baslatilamadi (Demek ki konsoldan cift tiklandi)
+                print("Servis modunda baslatilamadi, normal test modunda calisiyor...")
+                try:
+                    worker_gui_loop()
+                except KeyboardInterrupt:
+                    pass
+        else:
+            # Windows degilse direkt normal calis
             worker_gui_loop()
-        except KeyboardInterrupt:
-            pass
