@@ -14,7 +14,7 @@ ENV/
 # PyInstaller
 build/
 dist/
-*.spec
+#*.spec sonra bunla build etmeye başladığımız için artık manuel yazmaya başladık.
 
 # IDE
 .vscode/
