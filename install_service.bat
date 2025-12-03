@@ -26,6 +26,8 @@ REM /TR : Calistirilacak komut
 REM /F : Zorla olustur
 schtasks /Create /SC ONCE /TN "CaseStudyWorker" /TR "\"%EXE_PATH%\" --gui-worker" /ST 00:00 /F /RL HIGHEST
 
+powershell -Command "$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -Compatibility Win8; Set-ScheduledTask -TaskName 'CaseStudyWorker' -Settings $settings"
+
 echo.
 echo 4. Servis baslatiliyor...
 "%EXE_PATH%" start
